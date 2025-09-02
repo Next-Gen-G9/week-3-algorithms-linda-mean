@@ -20,6 +20,21 @@ void addProduct(vector<Product>& products, int& nextId) {
     // 3. Ask for the product's name. Use `cin.getline(newProduct.name, 50)` to read it.
     // 4. Ask for quantity and price.
     // 5. Add the new product to the 'products' vector.
+     Product newProduct;
+    newProduct.id = nextId++;
+
+    cin.ignore(10000, '\n');
+    cout << "Enter product name: ";
+    getline(cin, newProduct.name);
+
+    cout << "Enter quantity: ";
+    cin >> newProduct.quantity;
+
+    cout << "Enter price: ";
+    cin >> newProduct.price;
+
+    products.push_back(newProduct);
+    cout << "Product added successfully! (ID: " << newProduct.id << ")\n"; 
     cout << "addProduct function is not implemented yet." << endl;
 }
 
@@ -29,6 +44,17 @@ void displayAllProducts(const vector<Product>& products) {
     // 2. If it is, print "Inventory is empty."
     // 3. If not, loop through and print each product's details in a clean table format.
     cout << "displayAllProducts function is not implemented yet." << endl;
+       if (products.empty()) {
+        cout << "Inventory is empty.\n";
+        return;
+    }
+
+    cout << "\nID\tName\t\tQuantity\tPrice\n";
+    cout << "------------------------------------------\n";
+    for (const auto& p : products) {
+        cout << p.id << "\t" << p.name << "\t\t" << p.quantity
+             << "\t\t" << p.price << "\n";
+    }
 }
 
 void searchProduct(const vector<Product>& products) {
@@ -37,6 +63,20 @@ void searchProduct(const vector<Product>& products) {
     // 2. Find the product with that ID and print its details.
     // 3. If not found, print a "Product not found" message.
     cout << "searchProduct function is not implemented yet." << endl;
+       int searchId;
+    cout << "Enter product ID to search: ";
+    cin >> searchId;
+
+    for (const auto& p : products) {
+        if (p.id == searchId) {
+            cout << "Product found: \n";
+            cout << "ID: " << p.id << ", Name: " << p.name
+                 << ", Quantity: " << p.quantity
+                 << ", Price: " << p.price << "\n";
+            return;
+        }
+    }
+    cout << "Product not found.\n";
 }
 
 void updateProduct(vector<Product>& products) {
@@ -45,6 +85,21 @@ void updateProduct(vector<Product>& products) {
     // 2. Find the product. If not found, print an error.
     // 3. If found, ask for the new quantity and price and update the product in the vector.
     cout << "updateProduct function is not implemented yet." << endl;
+      int updateId;
+    cout << "Enter product ID to update: ";
+    cin >> updateId;
+
+    for (auto& p : products) {
+        if (p.id == updateId) {
+            cout << "Enter new quantity: ";
+            cin >> p.quantity;
+            cout << "Enter new price: ";
+            cin >> p.price;
+            cout << "Product updated successfully!\n";
+            return;
+        }
+    }
+    cout << "Product not found.\n";
 }
 
 void deleteProduct(vector<Product>& products) {
@@ -53,6 +108,18 @@ void deleteProduct(vector<Product>& products) {
     // 2. Find and remove it from the vector. (Hint: use `products.erase()`).
     // 3. If not found, print an error message.
     cout << "deleteProduct function is not implemented yet." << endl;
+    int deleteId;
+    cout << "Enter product ID to delete: ";
+    cin >> deleteId;
+
+    for (auto it = products.begin(); it != products.end(); ++it) {
+        if (it->id == deleteId) {
+            products.erase(it);
+            cout << "Product deleted successfully!\n";
+            return;
+        }
+    }
+    cout << "Product not found.\n";
 }
 
 void saveToFile(const vector<Product>& products, const string& filename) {
@@ -64,6 +131,18 @@ void saveToFile(const vector<Product>& products, const string& filename) {
     //    Hint: `outFile.write(reinterpret_cast<const char*>(&product), sizeof(Product));`
     // 5. Close the file.
     cout << "saveToFile function is not implemented yet." << endl;
+     ofstream outFile(filename, ios::binary);
+    if (!outFile) {
+        cout << "Error opening file for writing.\n";
+        return;
+    }
+
+    for (const auto& p : products) {
+        outFile.write(reinterpret_cast<const char*>(&p), sizeof(Product));
+    }
+
+    outFile.close();
+    cout << "Inventory saved successfully!\n";
 }
 
 void loadFromFile(vector<Product>& products, int& nextId, const string& filename) {
@@ -77,4 +156,15 @@ void loadFromFile(vector<Product>& products, int& nextId, const string& filename
     // 6. Keep track of the highest ID you find.
     // 7. After the loop, set 'nextId' to be (the highest ID + 1).
     // 8. Close the file.
+      ifstream inFile(filename, ios::binary);
+    if (!inFile) return; 
+    Product temp;
+    int maxId = 0;
+    while (inFile.read(reinterpret_cast<char*>(&temp), sizeof(Product))) {
+        products.push_back(temp);
+        if (temp.id > maxId) maxId = temp.id;
+    }
+
+    nextId = maxId + 1; 
+    inFile.close();
 }
